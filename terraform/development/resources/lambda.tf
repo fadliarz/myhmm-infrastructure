@@ -40,7 +40,8 @@ resource "aws_lambda_function" "enrollment-lambda" {
 
   environment {
     variables = {
-      USER_ASSIGNMENT_TABLE = var.dynamodb_user_assignment_table_name
+      USER_ASSIGNMENT_TABLE  = var.dynamodb_user_assignment_table_name
+      CLASS_ASSIGNMENT_TABLE = var.dynamodb_class_assignment_table_name
     }
   }
 }
