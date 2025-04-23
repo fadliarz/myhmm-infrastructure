@@ -253,6 +253,7 @@ resource "aws_iam_policy" "enrollment-lambda-iam-policy" {
         ],
         "Resource" : [
           aws_dynamodb_table.user-assignment-table.arn,
+          aws_dynamodb_table.class-assignment-table.arn
         ]
       },
       {
