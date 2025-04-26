@@ -60,6 +60,37 @@ resource "aws_lambda_event_source_mapping" "enrollment-lambda-event-source-mappi
  */
 
 
+resource "aws_lambda_function" "course-lambda" {
+  function_name = var.course_lambda_name
+  role          = aws_iam_role.course-lambda-iam-role.arn
+  handler       = var.course_lambda_courseEventHandler_name
+  runtime       = "nodejs20.x"
+  filename      = "./store/empty-lambda.zip"
+
+  timeout = 30
+
+  environment {
+    variables = {
+      LESSON_TABLE = var.dynamodb_lesson_table_name
+      CLASS_TABLE  = var.dynamodb_class_table_name
+    }
+  }
+}
+
+
+resource "aws_lambda_event_source_mapping" "course-lambda-event-source-mapping" {
+  function_name    = aws_lambda_function.course-lambda.function_name
+  event_source_arn = aws_sqs_queue.course-queue.arn
+  batch_size       = 1
+}
+
+
+/**
+
+
+ */
+
+
 
 variable "class_assignment_lambda_name" {
   type    = string
@@ -73,12 +104,6 @@ variable "class_assignment_lambda_classAssignmentEventHandler_name" {
 }
 
 
-/**
-
-
- */
-
-
 variable "enrollment_lambda_name" {
   type    = string
   default = "ENROLLMENT_LAMBDA"
@@ -89,3 +114,18 @@ variable "enrollment_lambda_enrollmentEventHandler_name" {
   type    = string
   default = "handleEnrollmentEvent.handleEnrollmentEvent"
 }
+
+
+variable "course_lambda_name" {
+  type    = string
+  default = "COURSE_LAMBDA"
+}
+
+
+variable "course_lambda_courseEventHandler_name" {
+  type    = string
+  default = "handleCourseEvent.handleCourseEvent"
+}
+
+
+
