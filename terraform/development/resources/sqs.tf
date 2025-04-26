@@ -39,6 +39,27 @@ resource "aws_sqs_queue" "enrollment-dlq" {
  */
 
 
+resource "aws_sqs_queue" "course-queue" {
+  name = var.course_queue_name
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.course-dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+
+resource "aws_sqs_queue" "course-dlq" {
+  name = var.course_dlq_name
+}
+
+
+/**
+
+
+ */
+
+
 variable "class_assignment_queue_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_QUEUE"
@@ -60,4 +81,16 @@ variable "enrollment_queue_name" {
 variable "enrollment_dlq_name" {
   type    = string
   default = "ENROLLMENT_DLQ"
+}
+
+
+variable "course_queue_name" {
+  type    = string
+  default = "COURSE_QUEUE"
+}
+
+
+variable "course_dlq_name" {
+  type    = string
+  default = "COURSE_DLQ"
 }
