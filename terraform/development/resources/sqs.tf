@@ -60,6 +60,27 @@ resource "aws_sqs_queue" "course-dlq" {
  */
 
 
+resource "aws_sqs_queue" "lesson-queue" {
+  name = var.lesson_queue_name
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.lesson-dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+
+resource "aws_sqs_queue" "lesson-dlq" {
+  name = var.lesson_dlq_name
+}
+
+
+/**
+
+
+ */
+
+
 variable "class_assignment_queue_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_QUEUE"
@@ -93,4 +114,16 @@ variable "course_queue_name" {
 variable "course_dlq_name" {
   type    = string
   default = "COURSE_DLQ"
+}
+
+
+variable "lesson_queue_name" {
+  type    = string
+  default = "LESSON_QUEUE"
+}
+
+
+variable "lesson_dlq_name" {
+  type    = string
+  default = "LESSON_DLQ"
 }
