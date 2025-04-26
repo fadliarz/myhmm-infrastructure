@@ -33,10 +33,21 @@ resource "aws_pipes_pipe" "course-pipe" {
   target   = aws_sqs_queue.course-queue.arn
   source_parameters {
     dynamodb_stream_parameters {
-      starting_position = "TRIM_HORIZON"
-      batch_size        = 1
+      starting_position                  = "TRIM_HORIZON"
+      batch_size                         = 1
+      maximum_record_age_in_seconds      = 86400
+      maximum_batching_window_in_seconds = 5
+    }
+
+    filter_criteria {
+      filter {
+        pattern = jsonencode({
+          eventName = ["REMOVE"]
+        })
+      }
     }
   }
+
 }
 
 
