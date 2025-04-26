@@ -26,6 +26,20 @@ resource "aws_pipes_pipe" "enrollment-pipe" {
 }
 
 
+resource "aws_pipes_pipe" "course-pipe" {
+  name     = var.course_pipe_name
+  role_arn = aws_iam_role.course-pipe-iam-role.arn
+  source   = aws_dynamodb_table.course-table.stream_arn
+  target   = aws_sqs_queue.course-queue.arn
+  source_parameters {
+    dynamodb_stream_parameters {
+      starting_position = "TRIM_HORIZON"
+      batch_size        = 1
+    }
+  }
+}
+
+
 variable "class_assignment_pipe_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_PIPE"
@@ -35,4 +49,9 @@ variable "class_assignment_pipe_name" {
 variable "enrollment_pipe_name" {
   type    = string
   default = "ENROLLMENT_PIPE"
+}
+
+variable "course_pipe_name" {
+  type    = string
+  default = "COURSE_PIPE"
 }
