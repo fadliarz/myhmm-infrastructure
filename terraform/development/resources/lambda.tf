@@ -91,6 +91,36 @@ resource "aws_lambda_event_source_mapping" "course-lambda-event-source-mapping" 
  */
 
 
+resource "aws_lambda_function" "lesson-lambda" {
+  function_name = var.lesson_lambda_name
+  role          = aws_iam_role.lesson-lambda-iam-role.arn
+  handler       = var.lesson_lambda_lessonEventHandler_name
+  runtime       = "nodejs20.x"
+  filename      = "./store/empty-lambda.zip"
+
+  timeout = 30
+
+  environment {
+    variables = {
+      VIDEO_TABLE      = var.dynamodb_video_table_name
+      ATTACHMENT_TABLE = var.dynamodb_attachment_table_name
+    }
+  }
+}
+
+
+resource "aws_lambda_event_source_mapping" "lesson-lambda-event-source-mapping" {
+  function_name    = aws_lambda_function.lesson-lambda.function_name
+  event_source_arn = aws_sqs_queue.lesson-queue.arn
+  batch_size       = 1
+}
+
+
+/**
+
+
+ */
+
 
 variable "class_assignment_lambda_name" {
   type    = string
@@ -128,4 +158,14 @@ variable "course_lambda_courseEventHandler_name" {
 }
 
 
+variable "lesson_lambda_name" {
+  type    = string
+  default = "LESSON_LAMBDA"
+}
+
+
+variable "lesson_lambda_lessonEventHandler_name" {
+  type    = string
+  default = "handleLessonEvent.handleLessonEvent"
+}
 
