@@ -74,6 +74,30 @@ resource "aws_pipes_pipe" "lesson-pipe" {
 }
 
 
+resource "aws_pipes_pipe" "class-pipe" {
+  name     = var.class_pipe_name
+  role_arn = aws_iam_role.class-pipe-iam-role.arn
+  source   = aws_dynamodb_table.class-table.stream_arn
+  target   = aws_sqs_queue.class-queue.arn
+  source_parameters {
+    dynamodb_stream_parameters {
+      starting_position                  = "TRIM_HORIZON"
+      batch_size                         = 1
+      maximum_record_age_in_seconds      = 86400
+      maximum_batching_window_in_seconds = 5
+    }
+
+    filter_criteria {
+      filter {
+        pattern = jsonencode({
+          eventName = ["REMOVE"]
+        })
+      }
+    }
+  }
+}
+
+
 variable "class_assignment_pipe_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_PIPE"
@@ -93,4 +117,9 @@ variable "course_pipe_name" {
 variable "lesson_pipe_name" {
   type    = string
   default = "LESSON_PIPE"
+}
+
+variable "class_pipe_name" {
+  type    = string
+  default = "CLASS_PIPE"
 }
