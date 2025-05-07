@@ -102,6 +102,27 @@ resource "aws_sqs_queue" "class-dlq" {
  */
 
 
+resource "aws_sqs_queue" "category-queue" {
+  name = var.category_queue_name
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.category-dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+
+resource "aws_sqs_queue" "category-dlq" {
+  name = var.category_dlq_name
+}
+
+
+/**
+
+
+ */
+
+
 variable "class_assignment_queue_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_QUEUE"
@@ -159,4 +180,15 @@ variable "class_queue_name" {
 variable "class_dlq_name" {
   type    = string
   default = "CLASS_DLQ"
+}
+
+variable "category_queue_name" {
+  type    = string
+  default = "CATEGORY_QUEUE"
+}
+
+
+variable "category_dlq_name" {
+  type    = string
+  default = "CATEGORY_DLQ"
 }
