@@ -152,6 +152,37 @@ resource "aws_lambda_event_source_mapping" "class-lambda-event-source-mapping" {
  */
 
 
+resource "aws_lambda_function" "category-lambda" {
+  function_name = var.category_lambda_name
+  role          = aws_iam_role.category-lambda-iam-role.arn
+  handler       = var.category_lambda_categoryEventHandler_name
+  runtime       = "nodejs20.x"
+  filename      = "./store/empty-lambda.zip"
+
+  timeout = 30
+
+  environment {
+    variables = {
+      CATEGORY_TABLE = var.dynamodb_category_table_name
+      COURSE_TABLE   = var.dynamodb_course_table_name
+    }
+  }
+}
+
+
+resource "aws_lambda_event_source_mapping" "category-lambda-event-source-mapping" {
+  function_name    = aws_lambda_function.category-lambda.function_name
+  event_source_arn = aws_sqs_queue.category-queue.arn
+  batch_size       = 1
+}
+
+
+/**
+
+
+ */
+
+
 variable "class_assignment_lambda_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_LAMBDA"
@@ -210,3 +241,16 @@ variable "class_lambda_classEventHandler_name" {
   type    = string
   default = "handleClassEvent.handleClassEvent"
 }
+
+
+variable "category_lambda_name" {
+  type    = string
+  default = "CATEGORY_LAMBDA"
+}
+
+
+variable "category_lambda_categoryEventHandler_name" {
+  type    = string
+  default = "handleCategoryEvent.handleCategoryEvent"
+}
+
