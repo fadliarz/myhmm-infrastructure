@@ -115,6 +115,13 @@ resource "aws_pipes_pipe" "category-pipe" {
       filter {
         pattern = jsonencode({
           eventName = ["REMOVE"]
+          dynamodb = {
+            OldImage = {
+              id = {
+                S = ["CATEGORY"]
+              }
+            }
+          }
         })
       }
     }
