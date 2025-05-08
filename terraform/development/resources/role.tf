@@ -680,6 +680,8 @@ resource "aws_iam_policy" "class-lambda-iam-policy" {
         ],
         "Resource" : [
           aws_dynamodb_table.class-assignment-table.arn,
+          "${aws_dynamodb_table.enrollment-table.arn}/index/*",
+          "${aws_dynamodb_table.instructor-table.arn}/index/*",
         ]
       },
       {
