@@ -152,7 +152,7 @@ resource "aws_dynamodb_table" "enrollment-table" {
   }
 
   global_secondary_index {
-    name            = "classId_userId"
+    name            = var.dynamodb_enrollment_table_gsi_name
     hash_key        = "classId"
     range_key       = "userId"
     projection_type = "ALL"
@@ -199,7 +199,7 @@ resource "aws_dynamodb_table" "instructor-table" {
   }
 
   global_secondary_index {
-    name            = "classId_userId"
+    name            = var.dynamodb_instructor_table_gsi_name
     hash_key        = "classId"
     range_key       = "userId"
     projection_type = "ALL"
@@ -453,4 +453,20 @@ variable "dynamodb_user_schedule_table_name" {
 variable "dynamodb_video_table_name" {
   type    = string
   default = "VIDEO_TABLE"
+}
+
+
+/**
+
+ */
+
+variable "dynamodb_instructor_table_gsi_name" {
+  type    = string
+  default = "classId_userId"
+}
+
+
+variable "dynamodb_enrollment_table_gsi_name" {
+  type    = string
+  default = "classId_userId"
 }
