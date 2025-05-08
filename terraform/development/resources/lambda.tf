@@ -135,6 +135,10 @@ resource "aws_lambda_function" "class-lambda" {
   environment {
     variables = {
       CLASS_ASSIGNMENT_TABLE = var.dynamodb_class_assignment_table_name
+      ENROLLMENT_TABLE       = var.dynamodb_enrollment_table_name
+      ENROLLMENT_TABLE_GSI   = var.dynamodb_enrollment_table_gsi_name
+      INSTRUCTOR_TABLE       = var.dynamodb_instructor_table_name
+      INSTRUCTOR_TABLE_GSI   = var.dynamodb_instructor_table_gsi_name
     }
   }
 }
