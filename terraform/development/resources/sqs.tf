@@ -123,6 +123,30 @@ resource "aws_sqs_queue" "category-dlq" {
  */
 
 
+resource "aws_sqs_queue" "enrollment-and-class-assignment-queue" {
+  name                        = var.enrollment_and_class_assignment_queue_name
+  fifo_queue                  = true
+  content_based_deduplication = true
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.enrollment-and-class-assignment-dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+
+resource "aws_sqs_queue" "enrollment-and-class-assignment-dlq" {
+  name       = var.enrollment_and_class_assignment_dlq_name
+  fifo_queue = true
+}
+
+
+/**
+
+
+ */
+
+
 variable "class_assignment_queue_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_QUEUE"
@@ -191,4 +215,16 @@ variable "category_queue_name" {
 variable "category_dlq_name" {
   type    = string
   default = "CATEGORY_DLQ"
+}
+
+
+variable "enrollment_and_class_assignment_queue_name" {
+  type    = string
+  default = "ENROLLMENT_AND_CLASS_ASSIGNMENT_QUEUE.fifo"
+}
+
+
+variable "enrollment_and_class_assignment_dlq_name" {
+  type    = string
+  default = "ENROLLMENT_AND_CLASS_ASSIGNMENT_DLQ.fifo"
 }

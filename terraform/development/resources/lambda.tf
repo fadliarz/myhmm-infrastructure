@@ -188,6 +188,38 @@ resource "aws_lambda_event_source_mapping" "category-lambda-event-source-mapping
  */
 
 
+resource "aws_lambda_function" "enrollment-and-class-assignment-lambda" {
+  function_name = var.enrollment_and_class_assignment_lambda_name
+  role          = aws_iam_role.enrollment-and-class-assignment-lambda-iam-role.arn
+  handler       = var.enrollment_and_class_assignment_lambda_enrollmentAndClassAssignmentEventHandler_name
+  runtime       = "nodejs20.x"
+  filename      = "./store/empty-lambda.zip"
+
+  timeout = 30
+
+  environment {
+    variables = {
+      USER_ASSIGNMENT_TABLE  = var.dynamodb_user_assignment_table_name
+      CLASS_ASSIGNMENT_TABLE = var.dynamodb_class_assignment_table_name
+      ENROLLMENT_TABLE       = var.dynamodb_enrollment_table_name
+    }
+  }
+}
+
+
+resource "aws_lambda_event_source_mapping" "enrollment-and-class-assignment-lambda-event-source-mapping" {
+  function_name    = aws_lambda_function.enrollment-and-class-assignment-lambda.function_name
+  event_source_arn = aws_sqs_queue.enrollment-and-class-assignment-queue.arn
+  batch_size       = 1
+}
+
+
+/**
+
+
+ */
+
+
 variable "class_assignment_lambda_name" {
   type    = string
   default = "CLASS_ASSIGNMENT_LAMBDA"
@@ -257,5 +289,17 @@ variable "category_lambda_name" {
 variable "category_lambda_categoryEventHandler_name" {
   type    = string
   default = "handleCategoryEvent.handleCategoryEvent"
+}
+
+
+variable "enrollment_and_class_assignment_lambda_name" {
+  type    = string
+  default = "ENROLLMENT_AND_CLASS_ASSIGNMENT_LAMBDA"
+}
+
+
+variable "enrollment_and_class_assignment_lambda_enrollmentAndClassAssignmentEventHandler_name" {
+  type    = string
+  default = "handleEnrollmentAndClassAssignmentEvent.handleEnrollmentAndClassAssignmentEvent"
 }
 
