@@ -523,7 +523,8 @@ resource "aws_iam_policy" "course-lambda-iam-policy" {
         ],
         "Resource" : [
           aws_dynamodb_table.lesson-table.arn,
-          aws_dynamodb_table.class-table.arn
+          aws_dynamodb_table.class-table.arn,
+          aws_dynamodb_table.category-table.arn
         ]
       },
       {
