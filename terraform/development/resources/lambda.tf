@@ -71,8 +71,9 @@ resource "aws_lambda_function" "course-lambda" {
 
   environment {
     variables = {
-      LESSON_TABLE = var.dynamodb_lesson_table_name
-      CLASS_TABLE  = var.dynamodb_class_table_name
+      LESSON_TABLE   = var.dynamodb_lesson_table_name
+      CLASS_TABLE    = var.dynamodb_class_table_name
+      CATEGORY_TABLE = var.dynamodb_category_table_name
     }
   }
 }
