@@ -844,6 +844,140 @@ resource "aws_iam_role_policy_attachment" "tag-pipe-iam-role-policy-attachment" 
  */
 
 
+resource "aws_iam_role" "scholarship-lambda-iam-role" {
+  name = var.scholarship_lambda_iam_role_name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "scholarship-lambda-iam-policy" {
+  name = var.scholarship_lambda_iam_policy_name
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "sqsPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        "Resource" : [
+          aws_sqs_queue.scholarship-queue.arn,
+          aws_sqs_queue.scholarship-dlq.arn
+        ]
+      },
+      {
+        "Sid" : "dynamodbPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:PutItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:Get*",
+          "dynamodb:Update*",
+          "dynamodb:Delete*",
+        ],
+        "Resource" : [
+          aws_dynamodb_table.tag-table.arn,
+        ]
+      },
+      {
+        "Sid" : "cloudwatchPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "scholarship-lambda-iam-role-policy-attachment" {
+  role       = aws_iam_role.scholarship-lambda-iam-role.name
+  policy_arn = aws_iam_policy.scholarship-lambda-iam-policy.arn
+}
+
+
+resource "aws_iam_role" "scholarship-pipe-iam-role" {
+  name = var.scholarship_pipe_iam_role_name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = "PipesPermissions"
+        Principal = {
+          Service = "pipes.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "scholarship-pipe-iam-policy" {
+  name = var.scholarship_pipe_iam_policy_name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Sid" : "dynamodbPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:DescribeStream",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
+        ],
+        "Resource" : [
+          aws_dynamodb_table.scholarship-table.stream_arn
+        ]
+      },
+      {
+        "Sid" : "sqsPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          aws_sqs_queue.scholarship-queue.arn,
+          aws_sqs_queue.scholarship-dlq.arn
+        ]
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "scholarship-pipe-iam-role-policy-attachment" {
+  role       = aws_iam_role.scholarship-pipe-iam-role.name
+  policy_arn = aws_iam_policy.scholarship-pipe-iam-policy.arn
+}
+
+
+/**
+
+
+ */
+
 variable "course_pipe_iam_role_name" {
   type    = string
   default = "COURSE_PIPE_IAM_ROLE"
@@ -1015,4 +1149,34 @@ variable "tag_lambda_iam_role_name" {
 variable "tag_lambda_iam_policy_name" {
   type    = string
   default = "TAG_LAMBDA_IAM_POLICY"
+}
+
+
+/**
+
+
+ */
+
+
+variable "scholarship_pipe_iam_role_name" {
+  type    = string
+  default = "SCHOLARSHIP_PIPE_IAM_ROLE"
+}
+
+
+variable "scholarship_pipe_iam_policy_name" {
+  type    = string
+  default = "SCHOLARSHIP_PIPE_IAM_POLICY"
+}
+
+
+variable "scholarship_lambda_iam_role_name" {
+  type    = string
+  default = "SCHOLARSHIP_LAMBDA_IAM_ROLE"
+}
+
+
+variable "scholarship_lambda_iam_policy_name" {
+  type    = string
+  default = "SCHOLARSHIP_LAMBDA_IAM_POLICY"
 }
