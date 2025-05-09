@@ -106,6 +106,27 @@ resource "aws_sqs_queue" "enrollment-and-class-assignment-dlq" {
  */
 
 
+resource "aws_sqs_queue" "tag-queue" {
+  name = var.tag_queue_name
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.tag-dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+
+resource "aws_sqs_queue" "tag-dlq" {
+  name = var.tag_dlq_name
+}
+
+
+/**
+
+
+ */
+
+
 variable "course_queue_name" {
   type    = string
   default = "COURSE_QUEUE"
@@ -162,4 +183,16 @@ variable "enrollment_and_class_assignment_queue_name" {
 variable "enrollment_and_class_assignment_dlq_name" {
   type    = string
   default = "ENROLLMENT_AND_CLASS_ASSIGNMENT_DLQ.fifo"
+}
+
+
+variable "tag_queue_name" {
+  type    = string
+  default = "TAG_QUEUE"
+}
+
+
+variable "tag_dlq_name" {
+  type    = string
+  default = "TAG_DLQ"
 }
