@@ -101,40 +101,9 @@ resource "aws_pipes_pipe" "category-pipe" {
 }
 
 
-resource "aws_pipes_pipe" "tag-pipe" {
-  name     = var.tag_pipe_name
-  role_arn = aws_iam_role.tag-pipe-iam-role.arn
-  source   = aws_dynamodb_table.tag-table.stream_arn
-  target   = aws_sqs_queue.tag-queue.arn
-  source_parameters {
-    dynamodb_stream_parameters {
-      starting_position                  = "TRIM_HORIZON"
-      batch_size                         = 1
-      maximum_record_age_in_seconds      = 86400
-      maximum_batching_window_in_seconds = 5
-    }
-
-    filter_criteria {
-      filter {
-        pattern = jsonencode({
-          eventName = ["REMOVE"]
-          dynamodb = {
-            OldImage = {
-              id = {
-                S = ["TAG"]
-              }
-            }
-          }
-        })
-      }
-    }
-  }
-}
-
 /**
 
  */
-
 
 
 resource "aws_pipes_pipe" "enrollment-and-class-assignment-pipe-for-enrollment-pipe" {
@@ -204,6 +173,66 @@ resource "aws_pipes_pipe" "enrollment-and-class-assignment-pipe-for-class-assign
  */
 
 
+resource "aws_pipes_pipe" "tag-pipe" {
+  name     = var.tag_pipe_name
+  role_arn = aws_iam_role.tag-pipe-iam-role.arn
+  source   = aws_dynamodb_table.tag-table.stream_arn
+  target   = aws_sqs_queue.tag-queue.arn
+  source_parameters {
+    dynamodb_stream_parameters {
+      starting_position                  = "TRIM_HORIZON"
+      batch_size                         = 1
+      maximum_record_age_in_seconds      = 86400
+      maximum_batching_window_in_seconds = 5
+    }
+
+    filter_criteria {
+      filter {
+        pattern = jsonencode({
+          eventName = ["REMOVE"]
+          dynamodb = {
+            OldImage = {
+              id = {
+                S = ["TAG"]
+              }
+            }
+          }
+        })
+      }
+    }
+  }
+}
+
+
+resource "aws_pipes_pipe" "scholarship-pipe" {
+  name     = var.scholarship_pipe_name
+  role_arn = aws_iam_role.scholarship-pipe-iam-role.arn
+  source   = aws_dynamodb_table.scholarship-table.stream_arn
+  target   = aws_sqs_queue.scholarship-queue.arn
+  source_parameters {
+    dynamodb_stream_parameters {
+      starting_position                  = "TRIM_HORIZON"
+      batch_size                         = 1
+      maximum_record_age_in_seconds      = 86400
+      maximum_batching_window_in_seconds = 5
+    }
+
+    filter_criteria {
+      filter {
+        pattern = jsonencode({
+          eventName = ["REMOVE"]
+        })
+      }
+    }
+  }
+}
+
+
+/**
+
+ */
+
+
 variable "course_pipe_name" {
   type    = string
   default = "COURSE_PIPE"
@@ -224,11 +253,6 @@ variable "category_pipe_name" {
   default = "CATEGORY_PIPE"
 }
 
-variable "tag_pipe_name" {
-  type    = string
-  default = "TAG_PIPE"
-}
-
 variable "enrollment_and_class_assignment_pipe_for_enrollment_name" {
   type    = string
   default = "ENROLLMENT_AND_CLASS_ASSIGNMENT_PIPE_FOR_ENROLLMENT"
@@ -237,4 +261,14 @@ variable "enrollment_and_class_assignment_pipe_for_enrollment_name" {
 variable "enrollment_and_class_assignment_pipe_for_class_assignment_name" {
   type    = string
   default = "ENROLLMENT_AND_CLASS_ASSIGNMENT_PIPE_FOR_CLASS_ASSIGNMENT"
+}
+
+variable "tag_pipe_name" {
+  type    = string
+  default = "TAG_PIPE"
+}
+
+variable "scholarship_pipe_name" {
+  type    = string
+  default = "SCHOLARSHIP_PIPE"
 }
