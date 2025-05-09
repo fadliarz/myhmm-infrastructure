@@ -402,6 +402,7 @@ resource "aws_iam_policy" "class-lambda-iam-policy" {
           "${aws_dynamodb_table.instructor-table.arn}/index/*",
           aws_dynamodb_table.course-table.arn,
           aws_dynamodb_table.user-table.arn,
+          aws_dynamodb_table.user-assignment-table.arn,
         ]
       },
       {
