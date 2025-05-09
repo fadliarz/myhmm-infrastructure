@@ -101,6 +101,36 @@ resource "aws_pipes_pipe" "category-pipe" {
 }
 
 
+resource "aws_pipes_pipe" "tag-pipe" {
+  name     = var.tag_pipe_name
+  role_arn = aws_iam_role.tag-pipe-iam-role.arn
+  source   = aws_dynamodb_table.tag-table.stream_arn
+  target   = aws_sqs_queue.tag-queue.arn
+  source_parameters {
+    dynamodb_stream_parameters {
+      starting_position                  = "TRIM_HORIZON"
+      batch_size                         = 1
+      maximum_record_age_in_seconds      = 86400
+      maximum_batching_window_in_seconds = 5
+    }
+
+    filter_criteria {
+      filter {
+        pattern = jsonencode({
+          eventName = ["REMOVE"]
+          dynamodb = {
+            OldImage = {
+              id = {
+                S = ["TAG"]
+              }
+            }
+          }
+        })
+      }
+    }
+  }
+}
+
 /**
 
  */
@@ -192,6 +222,11 @@ variable "class_pipe_name" {
 variable "category_pipe_name" {
   type    = string
   default = "CATEGORY_PIPE"
+}
+
+variable "tag_pipe_name" {
+  type    = string
+  default = "TAG_PIPE"
 }
 
 variable "enrollment_and_class_assignment_pipe_for_enrollment_name" {
