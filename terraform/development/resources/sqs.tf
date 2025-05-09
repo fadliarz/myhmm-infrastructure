@@ -127,6 +127,28 @@ resource "aws_sqs_queue" "tag-dlq" {
  */
 
 
+resource "aws_sqs_queue" "scholarship-queue" {
+  name = var.scholarship_queue_name
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.scholarship-dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+
+resource "aws_sqs_queue" "scholarship-dlq" {
+  name = var.scholarship_dlq_name
+}
+
+
+/**
+
+
+ */
+
+
+
 variable "course_queue_name" {
   type    = string
   default = "COURSE_QUEUE"
@@ -196,3 +218,16 @@ variable "tag_dlq_name" {
   type    = string
   default = "TAG_DLQ"
 }
+
+
+variable "scholarship_queue_name" {
+  type    = string
+  default = "SCHOLARSHIP_QUEUE"
+}
+
+
+variable "scholarship_dlq_name" {
+  type    = string
+  default = "SCHOLARSHIP_DLQ"
+}
+
