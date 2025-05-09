@@ -43,6 +43,7 @@ resource "aws_lambda_function" "lesson-lambda" {
     variables = {
       VIDEO_TABLE      = var.dynamodb_video_table_name
       ATTACHMENT_TABLE = var.dynamodb_attachment_table_name
+      COURSE_TABLE     = var.dynamodb_course_table_name
     }
   }
 }
