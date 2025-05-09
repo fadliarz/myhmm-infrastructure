@@ -193,6 +193,36 @@ resource "aws_lambda_event_source_mapping" "tag-lambda-event-source-mapping" {
  */
 
 
+resource "aws_lambda_function" "scholarship-lambda" {
+  function_name = var.scholarship_lambda_name
+  role          = aws_iam_role.scholarship-lambda-iam-role.arn
+  handler       = var.scholarship_lambda_scholarshipEventHandler_name
+  runtime       = "nodejs20.x"
+  filename      = "./store/empty-lambda.zip"
+
+  timeout = 30
+
+  environment {
+    variables = {
+      TAG_TABLE = var.dynamodb_tag_table_name
+    }
+  }
+}
+
+
+resource "aws_lambda_event_source_mapping" "scholarship-lambda-event-source-mapping" {
+  function_name    = aws_lambda_function.scholarship-lambda.function_name
+  event_source_arn = aws_sqs_queue.scholarship-queue.arn
+  batch_size       = 1
+}
+
+
+/**
+
+
+ */
+
+
 variable "enrollment_lambda_enrollmentEventHandler_name" {
   type    = string
   default = "handleEnrollmentEvent.handleEnrollmentEvent"
@@ -269,4 +299,17 @@ variable "tag_lambda_tagEventHandler_name" {
   type    = string
   default = "handleTagEvent.handleTagEvent"
 }
+
+
+variable "scholarship_lambda_name" {
+  type    = string
+  default = "SCHOLARSHIP_LAMBDA"
+}
+
+
+variable "scholarship_lambda_scholarshipEventHandler_name" {
+  type    = string
+  default = "handleScholarshipEvent.handleScholarshipEvent"
+}
+
 
