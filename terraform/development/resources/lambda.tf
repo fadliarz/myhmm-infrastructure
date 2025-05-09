@@ -78,6 +78,7 @@ resource "aws_lambda_function" "class-lambda" {
       ENROLLMENT_TABLE_GSI   = var.dynamodb_enrollment_table_gsi_name
       INSTRUCTOR_TABLE       = var.dynamodb_instructor_table_name
       INSTRUCTOR_TABLE_GSI   = var.dynamodb_instructor_table_gsi_name
+      COURSE_TABLE           = var.dynamodb_course_table_name
     }
   }
 }
