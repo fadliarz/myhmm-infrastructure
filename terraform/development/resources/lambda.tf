@@ -80,6 +80,7 @@ resource "aws_lambda_function" "class-lambda" {
       INSTRUCTOR_TABLE_GSI   = var.dynamodb_instructor_table_gsi_name
       COURSE_TABLE           = var.dynamodb_course_table_name
       USER_TABLE             = var.dynamodb_user_table_name
+      USER_ASSIGNMENT_TABLE  = var.dynamodb_user_assignment_table_name
     }
   }
 }
