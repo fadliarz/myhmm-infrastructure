@@ -162,6 +162,37 @@ resource "aws_lambda_event_source_mapping" "enrollment-and-class-assignment-lamb
  */
 
 
+resource "aws_lambda_function" "tag-lambda" {
+  function_name = var.tag_lambda_name
+  role          = aws_iam_role.tag-lambda-iam-role.arn
+  handler       = var.tag_lambda_tagEventHandler_name
+  runtime       = "nodejs20.x"
+  filename      = "./store/empty-lambda.zip"
+
+  timeout = 30
+
+  environment {
+    variables = {
+      TAG_TABLE         = var.dynamodb_tag_table_name
+      SCHOLARSHIP_TABLE = var.dynamodb_scholarship_table_name
+    }
+  }
+}
+
+
+resource "aws_lambda_event_source_mapping" "tag-lambda-event-source-mapping" {
+  function_name    = aws_lambda_function.tag-lambda.function_name
+  event_source_arn = aws_sqs_queue.tag-queue.arn
+  batch_size       = 1
+}
+
+
+/**
+
+
+ */
+
+
 variable "enrollment_lambda_enrollmentEventHandler_name" {
   type    = string
   default = "handleEnrollmentEvent.handleEnrollmentEvent"
@@ -225,5 +256,17 @@ variable "enrollment_and_class_assignment_lambda_name" {
 variable "enrollment_and_class_assignment_lambda_enrollmentAndClassAssignmentEventHandler_name" {
   type    = string
   default = "handleEnrollmentAndClassAssignmentEvent.handleEnrollmentAndClassAssignmentEvent"
+}
+
+
+variable "tag_lambda_name" {
+  type    = string
+  default = "TAG_LAMBDA"
+}
+
+
+variable "tag_lambda_tagEventHandler_name" {
+  type    = string
+  default = "handleTagEvent.handleTagEvent"
 }
 
