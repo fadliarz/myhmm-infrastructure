@@ -1,7 +1,7 @@
 resource "aws_sqs_queue" "course-queue" {
   name                      = var.course_queue_name
   receive_wait_time_seconds = 20
-  
+
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.course-dlq.arn
     maxReceiveCount     = 5
@@ -151,6 +151,27 @@ resource "aws_sqs_queue" "scholarship-dlq" {
  */
 
 
+resource "aws_sqs_queue" "main-queue" {
+  name                      = var.main_queue_name
+  receive_wait_time_seconds = 20
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.main-dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+
+resource "aws_sqs_queue" "main-dlq" {
+  name = var.main_dlq_name
+}
+
+
+/**
+
+
+ */
+
 
 variable "course_queue_name" {
   type    = string
@@ -232,5 +253,17 @@ variable "scholarship_queue_name" {
 variable "scholarship_dlq_name" {
   type    = string
   default = "SCHOLARSHIP_DLQ"
+}
+
+
+variable "main_queue_name" {
+  type    = string
+  default = "MAIN_QUEUE"
+}
+
+
+variable "main_dlq_name" {
+  type    = string
+  default = "MAIN_DLQ"
 }
 
