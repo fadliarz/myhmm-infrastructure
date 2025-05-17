@@ -1,6 +1,7 @@
 resource "aws_sqs_queue" "course-queue" {
-  name = var.course_queue_name
-
+  name                      = var.course_queue_name
+  receive_wait_time_seconds = 20
+  
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.course-dlq.arn
     maxReceiveCount     = 5
@@ -134,6 +135,8 @@ resource "aws_sqs_queue" "scholarship-queue" {
     deadLetterTargetArn = aws_sqs_queue.scholarship-dlq.arn
     maxReceiveCount     = 5
   })
+
+
 }
 
 
