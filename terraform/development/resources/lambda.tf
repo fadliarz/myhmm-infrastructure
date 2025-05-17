@@ -232,6 +232,12 @@ resource "aws_lambda_function" "main-lambda" {
   filename      = "./store/empty-lambda.zip"
 
   timeout = 30
+
+  environment {
+    variables = {
+      API_URL = "https://myhmm.tech"
+    }
+  }
 }
 
 
