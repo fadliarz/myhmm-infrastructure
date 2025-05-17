@@ -224,6 +224,31 @@ resource "aws_lambda_event_source_mapping" "scholarship-lambda-event-source-mapp
  */
 
 
+resource "aws_lambda_function" "main-lambda" {
+  function_name = var.main_lambda_name
+  role          = aws_iam_role.main-lambda-iam-role.arn
+  handler       = var.main_lambda_mainEventHandler_name
+  runtime       = "nodejs20.x"
+  filename      = "./store/empty-lambda.zip"
+
+  timeout = 30
+}
+
+
+resource "aws_lambda_event_source_mapping" "main-lambda-event-source-mapping" {
+  function_name                      = aws_lambda_function.main-lambda.function_name
+  event_source_arn                   = aws_sqs_queue.main-queue.arn
+  batch_size                         = 60
+  maximum_batching_window_in_seconds = 30
+}
+
+
+/**
+
+
+ */
+
+
 variable "enrollment_lambda_enrollmentEventHandler_name" {
   type    = string
   default = "handleEnrollmentEvent.handleEnrollmentEvent"
@@ -311,6 +336,18 @@ variable "scholarship_lambda_name" {
 variable "scholarship_lambda_scholarshipEventHandler_name" {
   type    = string
   default = "handleScholarshipEvent.handleScholarshipEvent"
+}
+
+
+variable "main_lambda_name" {
+  type    = string
+  default = "MAIN_LAMBDA"
+}
+
+
+variable "main_lambda_mainEventHandler_name" {
+  type    = string
+  default = "handleMainEvent.handleMainEvent"
 }
 
 
