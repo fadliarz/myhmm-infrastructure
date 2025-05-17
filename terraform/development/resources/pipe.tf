@@ -220,7 +220,7 @@ resource "aws_pipes_pipe" "scholarship-pipe" {
     filter_criteria {
       filter {
         pattern = jsonencode({
-          eventName = ["REMOVE"]
+          eventName = ["INSERT", "REMOVE"]
         })
       }
     }
