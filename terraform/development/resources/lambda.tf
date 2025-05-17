@@ -18,9 +18,10 @@ resource "aws_lambda_function" "course-lambda" {
 
 
 resource "aws_lambda_event_source_mapping" "course-lambda-event-source-mapping" {
-  function_name    = aws_lambda_function.course-lambda.function_name
-  event_source_arn = aws_sqs_queue.course-queue.arn
-  batch_size       = 1
+  function_name                      = aws_lambda_function.course-lambda.function_name
+  event_source_arn                   = aws_sqs_queue.course-queue.arn
+  batch_size                         = 2
+  maximum_batching_window_in_seconds = 300
 }
 
 
