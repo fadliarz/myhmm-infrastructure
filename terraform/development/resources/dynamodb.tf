@@ -370,6 +370,26 @@ resource "aws_dynamodb_table" "video-table" {
 }
 
 
+resource "aws_dynamodb_table" "notification-table" {
+  name         = var.dynamodb_notification_table_name
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "userId"
+  range_key    = "notificationId"
+
+  attribute {
+    name = "userId"
+    type = "N"
+  }
+  attribute {
+    name = "notificationId"
+    type = "N"
+  }
+
+  stream_enabled   = true
+  stream_view_type = "NEW_AND_OLD_IMAGES"
+}
+
+
 variable "dynamodb_attachment_table_name" {
   type    = string
   default = "ATTACHMENT_TABLE"
@@ -453,6 +473,11 @@ variable "dynamodb_user_schedule_table_name" {
 variable "dynamodb_video_table_name" {
   type    = string
   default = "VIDEO_TABLE"
+}
+
+variable "dynamodb_notification_table_name" {
+  type    = string
+  default = "NOTIFICATION_TABLE"
 }
 
 
