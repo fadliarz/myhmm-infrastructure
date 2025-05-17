@@ -228,6 +228,30 @@ resource "aws_pipes_pipe" "scholarship-pipe" {
 }
 
 
+resource "aws_pipes_pipe" "notification-pipe" {
+  name     = var.notification_pipe_name
+  role_arn = aws_iam_role.main-pipe-iam-role.arn
+  source   = aws_dynamodb_table.notification-table.stream_arn
+  target   = aws_sqs_queue.main-queue.arn
+  source_parameters {
+    dynamodb_stream_parameters {
+      starting_position                  = "TRIM_HORIZON"
+      batch_size                         = 1
+      maximum_record_age_in_seconds      = 86400
+      maximum_batching_window_in_seconds = 5
+    }
+
+    filter_criteria {
+      filter {
+        pattern = jsonencode({
+          eventName = ["INSERT"]
+        })
+      }
+    }
+  }
+}
+
+
 /**
 
  */
@@ -271,4 +295,9 @@ variable "tag_pipe_name" {
 variable "scholarship_pipe_name" {
   type    = string
   default = "SCHOLARSHIP_PIPE"
+}
+
+variable "notification_pipe_name" {
+  type    = string
+  default = "NOTIFICATION_PIPE"
 }
