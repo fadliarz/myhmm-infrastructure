@@ -205,7 +205,9 @@ resource "aws_lambda_function" "scholarship-lambda" {
 
   environment {
     variables = {
-      TAG_TABLE = var.dynamodb_tag_table_name
+      TAG_TABLE          = var.dynamodb_tag_table_name
+      NOTIFICATION_TABLE = var.dynamodb_notification_table_name
+      USER_TABLE         = var.dynamodb_user_table_name
     }
   }
 }
