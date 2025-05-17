@@ -892,6 +892,8 @@ resource "aws_iam_policy" "scholarship-lambda-iam-policy" {
         ],
         "Resource" : [
           aws_dynamodb_table.tag-table.arn,
+          aws_dynamodb_table.notification-table.arn,
+          aws_dynamodb_table.user-table.arn,
         ]
       },
       {
