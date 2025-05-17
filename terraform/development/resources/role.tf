@@ -978,6 +978,127 @@ resource "aws_iam_role_policy_attachment" "scholarship-pipe-iam-role-policy-atta
 
  */
 
+
+resource "aws_iam_role" "main-lambda-iam-role" {
+  name = var.main_lambda_iam_role_name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "main-lambda-iam-policy" {
+  name = var.main_lambda_iam_policy_name
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "sqsPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        "Resource" : [
+          aws_sqs_queue.main-queue.arn,
+          aws_sqs_queue.main-dlq.arn
+        ]
+      },
+      {
+        "Sid" : "cloudwatchPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "main-lambda-iam-role-policy-attachment" {
+  role       = aws_iam_role.main-lambda-iam-role.name
+  policy_arn = aws_iam_policy.main-lambda-iam-policy.arn
+}
+
+
+resource "aws_iam_role" "main-pipe-iam-role" {
+  name = var.main_pipe_iam_role_name
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = "PipesPermissions"
+        Principal = {
+          Service = "pipes.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "main-pipe-iam-policy" {
+  name = var.main_pipe_iam_policy_name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Sid" : "dynamodbPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:DescribeStream",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
+        ],
+        "Resource" : [
+          aws_dynamodb_table.notification-table.stream_arn
+        ]
+      },
+      {
+        "Sid" : "sqsPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          aws_sqs_queue.main-queue.arn,
+          aws_sqs_queue.main-dlq.arn
+        ]
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "main-pipe-iam-role-policy-attachment" {
+  role       = aws_iam_role.main-pipe-iam-role.name
+  policy_arn = aws_iam_policy.main-pipe-iam-policy.arn
+}
+
+
+/**
+
+
+ */
+
+
 variable "course_pipe_iam_role_name" {
   type    = string
   default = "COURSE_PIPE_IAM_ROLE"
@@ -1179,4 +1300,34 @@ variable "scholarship_lambda_iam_role_name" {
 variable "scholarship_lambda_iam_policy_name" {
   type    = string
   default = "SCHOLARSHIP_LAMBDA_IAM_POLICY"
+}
+
+
+/**
+
+
+ */
+
+
+variable "main_pipe_iam_role_name" {
+  type    = string
+  default = "MAIN_PIPE_IAM_ROLE"
+}
+
+
+variable "main_pipe_iam_policy_name" {
+  type    = string
+  default = "MAIN_PIPE_IAM_POLICY"
+}
+
+
+variable "main_lambda_iam_role_name" {
+  type    = string
+  default = "MAIN_LAMBDA_IAM_ROLE"
+}
+
+
+variable "main_lambda_iam_policy_name" {
+  type    = string
+  default = "MAIN_LAMBDA_IAM_POLICY"
 }
